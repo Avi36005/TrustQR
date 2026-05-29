@@ -52,7 +52,7 @@ export default function Scanner() {
             navigator.vibrate(200)
           }
 
-          navigate('/report', {
+          navigate('/app/report', {
             state: {
               scan: entry,
               result,
@@ -90,7 +90,7 @@ export default function Scanner() {
       {/* header */}
       <div className="flex items-center px-5 pt-5 pb-3">
         <span className="font-serif text-2xl text-black tracking-tight" style={{ fontFamily: 'Instrument Serif, serif' }}>
-          PreQR
+          TrustQR
         </span>
       </div>
 
@@ -136,13 +136,13 @@ export default function Scanner() {
       {/* bottom links */}
       <div className="flex justify-center gap-8 mt-auto pb-8 pt-4">
         <button
-          onClick={() => navigate('/history')}
+          onClick={() => navigate('/app/history')}
           className="text-sm text-black underline underline-offset-2 bg-transparent border-none cursor-pointer"
         >
           History
         </button>
         <button
-          onClick={() => navigate('/about')}
+          onClick={() => navigate('/app/about')}
           className="text-sm text-black underline underline-offset-2 bg-transparent border-none cursor-pointer"
         >
           About

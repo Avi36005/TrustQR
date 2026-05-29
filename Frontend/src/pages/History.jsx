@@ -16,7 +16,7 @@ export default function History() {
   const history = getHistory()
 
   function handleRowClick(entry) {
-    navigate('/report', {
+    navigate('/app/report', {
       state: {
         scan: entry,
         result: {
@@ -34,7 +34,7 @@ export default function History() {
       {/* header */}
       <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-[#E5E5E5]">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/app')}
           className="p-1 -ml-1 bg-transparent border-none cursor-pointer"
           aria-label="Go back"
         >

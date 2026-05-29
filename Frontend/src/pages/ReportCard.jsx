@@ -1,25 +1,26 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { Check, X, AlertTriangle, ArrowRight } from 'lucide-react'
 import CheckRow from '../components/CheckRow'
-import SafetyDot from '../components/SafetyDot'
 import { flagQR } from '../utils/api'
 
 const safetyConfig = {
   safe: {
     label: 'SAFE',
-    color: '#2D7A4F',
-    bg: '#F0FAF4',
+    dotColor: '#2D7A4F',
+    borderColor: '#2D7A4F',
+    actionText: 'Looks clean. You can proceed.',
   },
   caution: {
     label: 'CAUTION',
-    color: '#D4A017',
-    bg: '#FFFBF0',
+    dotColor: '#D4A017',
+    borderColor: '#D4A017',
+    actionText: 'Proceed carefully. Verify before acting.',
   },
   danger: {
     label: 'DANGER',
-    color: '#C73E1D',
-    bg: '#FFF5F3',
+    dotColor: '#C73E1D',
+    borderColor: '#C73E1D',
+    actionText: 'Do not proceed. Close this immediately.',
   },
 }
 
@@ -57,103 +58,133 @@ export default function ReportCard() {
 
   return (
     <div className="fixed inset-0 flex flex-col justify-end z-40" style={{ maxWidth: 480, margin: '0 auto' }}>
-      {/* dim backdrop */}
+      {/* backdrop */}
       <div
-        className="absolute inset-0 bg-black bg-opacity-30"
+        className="absolute inset-0"
+        style={{ background: 'rgba(0,0,0,0.4)' }}
         onClick={() => navigate('/app')}
       />
 
-      {/* card */}
+      {/* report card — no rounded corners, feels like a definitive report */}
       <div
-        className="relative bg-white slide-up rounded-t-2xl overflow-y-auto"
-        style={{ maxHeight: '90vh' }}
+        className="relative bg-white slide-up overflow-y-auto"
+        style={{ maxHeight: '92vh' }}
       >
-        {/* drag handle */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 bg-[#E5E5E5] rounded-full" />
-        </div>
+        {/* top accent bar — color-coded by safety */}
+        <div style={{ height: 3, background: cfg.dotColor, width: '100%' }} />
 
-        <div className="px-5 pb-8">
-          {/* safety header */}
-          <div className="flex items-center gap-3 mt-4 mb-2">
-            <SafetyDot safety={safety} size={14} />
-            <span
-              className="font-bold"
-              style={{ fontSize: 48, color: '#000', lineHeight: 1, fontFamily: 'Inter, sans-serif' }}
-            >
-              {cfg.label}
-            </span>
+        <div className="px-5 pb-8 pt-5">
+
+          {/* status + verdict */}
+          <div className="mb-5">
+            <div className="flex items-center gap-2.5 mb-2">
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  background: cfg.dotColor,
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                className="font-bold tracking-wide"
+                style={{ fontSize: 42, color: '#000', lineHeight: 1, fontFamily: 'Inter, sans-serif', letterSpacing: '-0.5px' }}
+              >
+                {cfg.label}
+              </span>
+            </div>
+            <p className="text-base text-black leading-snug mb-1">
+              {result.verdict || 'This QR code has been analyzed.'}
+            </p>
+            <p className="text-sm" style={{ color: cfg.dotColor }}>
+              {cfg.actionText}
+            </p>
           </div>
 
-          {/* verdict */}
-          <p className="text-base text-black mb-5" style={{ lineHeight: 1.5 }}>
-            {result.verdict || 'This QR code has been analyzed.'}
-          </p>
-
-          {/* UPI direction banner */}
+          {/* UPI direction — most important info for UPI scams */}
           {isUPI && upiInfo && (
             <div
-              className="border border-[#E5E5E5] px-4 py-4 mb-5"
-              style={{ background: '#FAFAFA' }}
+              className="mb-5 px-4 py-4"
+              style={{
+                border: `1.5px solid ${upiInfo.direction === 'outgoing' ? '#C73E1D' : '#2D7A4F'}`,
+                background: upiInfo.direction === 'outgoing' ? '#FFF8F7' : '#F6FBF8',
+              }}
             >
-              <p className="text-base font-semibold text-black leading-snug">
+              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#999' }}>
+                Money direction
+              </p>
+              <p className="font-bold text-black" style={{ fontSize: 20, lineHeight: 1.2 }}>
                 Money will{' '}
                 <span style={{ color: upiInfo.direction === 'outgoing' ? '#C73E1D' : '#2D7A4F' }}>
-                  {upiInfo.direction === 'outgoing' ? 'LEAVE' : 'COME TO'}
+                  {upiInfo.direction === 'outgoing' ? 'LEAVE' : 'ENTER'}
                 </span>{' '}
                 your account
               </p>
-              {upiInfo.payee_name && (
-                <p className="text-sm text-[#666] mt-1">
-                  Payee: {upiInfo.payee_name}
-                </p>
-              )}
-              {upiInfo.upi_id && (
-                <p className="text-sm text-[#666]">
-                  UPI ID: {upiInfo.upi_id}
-                </p>
-              )}
-              {upiInfo.amount && (
-                <p className="text-sm font-medium text-black mt-1">
-                  Amount: ₹{upiInfo.amount}
-                </p>
-              )}
+              <div className="mt-3 flex flex-col gap-1">
+                {upiInfo.payee_name && (
+                  <p className="text-sm text-black">
+                    <span className="text-[#666]">Payee: </span>{upiInfo.payee_name}
+                  </p>
+                )}
+                {upiInfo.upi_id && (
+                  <p className="text-sm text-black font-mono">
+                    <span className="text-[#666] font-sans">ID: </span>{upiInfo.upi_id}
+                  </p>
+                )}
+                {upiInfo.amount && (
+                  <p className="text-sm font-semibold text-black">
+                    Amount: ₹{upiInfo.amount}
+                  </p>
+                )}
+              </div>
               {upiInfo.is_collect_request && (
-                <p className="text-sm text-[#C73E1D] mt-1 font-medium">
-                  This is a collect request — do not pay without verification
+                <p
+                  className="text-xs font-semibold mt-3 px-2 py-1.5 uppercase tracking-wide"
+                  style={{ background: '#C73E1D', color: '#fff' }}
+                >
+                  Collect request — this takes money from you
                 </p>
               )}
             </div>
           )}
 
-          {/* checks */}
+          {/* security checks */}
           {checks.length > 0 && (
-            <div className="border border-[#E5E5E5] px-4 mb-5">
-              {checks.map((c, i) => (
-                <CheckRow key={i} label={c.label} passed={c.passed} value={c.value} />
-              ))}
+            <div className="mb-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#999] mb-2">
+                Security checks
+              </p>
+              <div style={{ border: '1px solid #E5E5E5' }}>
+                <div className="px-4">
+                  {checks.map((c, i) => (
+                    <CheckRow key={i} label={c.label} passed={c.passed} value={c.value} />
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
-          {/* action buttons */}
-          <div className="flex gap-3 mb-4">
+          {/* actions */}
+          <div className="flex gap-3 mb-5">
             <button
               onClick={() => navigate('/app/details', { state: { scan, result } })}
-              className="flex-1 py-3 border border-black text-sm font-medium text-black bg-white active:bg-gray-100 transition-colors"
+              className="flex-1 py-3 text-sm font-medium text-black bg-white transition-colors"
+              style={{ border: '1px solid #000' }}
             >
               See Details
             </button>
             <button
               onClick={handleFlag}
               disabled={flagged || flagging}
-              className="flex-1 py-3 border border-black text-sm font-medium text-white active:opacity-80 transition-opacity disabled:opacity-50"
-              style={{ background: flagged ? '#666' : '#000' }}
+              className="flex-1 py-3 text-sm font-medium text-white transition-opacity disabled:opacity-50"
+              style={{ background: flagged ? '#666' : '#000', border: '1px solid #000' }}
             >
               {flagged ? 'Reported' : flagging ? 'Reporting...' : 'Report as Scam'}
             </button>
           </div>
 
-          {/* scan again */}
           <div className="flex justify-center">
             <button
               onClick={() => navigate('/app')}
@@ -162,6 +193,7 @@ export default function ReportCard() {
               Scan Again
             </button>
           </div>
+
         </div>
       </div>
     </div>

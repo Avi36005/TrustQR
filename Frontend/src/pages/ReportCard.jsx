@@ -31,7 +31,7 @@ export default function ReportCard() {
 
   const state = location.state
   if (!state || !state.result) {
-    navigate('/')
+    navigate('/app')
     return null
   }
 
@@ -60,7 +60,7 @@ export default function ReportCard() {
       {/* dim backdrop */}
       <div
         className="absolute inset-0 bg-black bg-opacity-30"
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/app')}
       />
 
       {/* card */}
@@ -138,7 +138,7 @@ export default function ReportCard() {
           {/* action buttons */}
           <div className="flex gap-3 mb-4">
             <button
-              onClick={() => navigate('/details', { state: { scan, result } })}
+              onClick={() => navigate('/app/details', { state: { scan, result } })}
               className="flex-1 py-3 border border-black text-sm font-medium text-black bg-white active:bg-gray-100 transition-colors"
             >
               See Details
@@ -156,7 +156,7 @@ export default function ReportCard() {
           {/* scan again */}
           <div className="flex justify-center">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/app')}
               className="text-sm text-black underline underline-offset-2 bg-transparent border-none cursor-pointer"
             >
               Scan Again

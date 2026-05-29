@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --color-safe: #2D7A4F;
+  --color-caution: #D4A017;
+  --color-danger: #C73E1D;
+  --color-border: #E5E5E5;
+  --font-family-sans: 'Inter', sans-serif;
+  --font-family-serif: 'Instrument Serif', serif;
+}
+
 * {
   box-sizing: border-box;
 }

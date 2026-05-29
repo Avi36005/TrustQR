@@ -20,7 +20,7 @@ export default function About() {
       {/* header */}
       <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-[#E5E5E5]">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/app')}
           className="p-1 -ml-1 bg-transparent border-none cursor-pointer"
           aria-label="Go back"
         >
@@ -32,12 +32,12 @@ export default function About() {
       {/* content */}
       <div className="flex-1 overflow-y-auto">
 
-        <Section title="Why PreQR exists">
+        <Section title="Why TrustQR exists">
           <p className="text-sm text-[#444] leading-relaxed">
             QR code scams are rising rapidly across India. Fraudsters place fake QR codes in shops, on bills, and in messages to trick people into sending money or visiting malicious websites.
           </p>
           <p className="text-sm text-[#444] leading-relaxed mt-2">
-            PreQR gives you a second opinion before you act — so you can scan confidently, not blindly.
+            TrustQR gives you a second opinion before you act — so you can scan confidently, not blindly.
           </p>
         </Section>
 

@@ -29,7 +29,7 @@ export default function Details() {
 
   const state = location.state
   if (!state || !state.result) {
-    navigate('/')
+    navigate('/app')
     return null
   }
 

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Landing from './pages/Landing'
 import Scanner from './pages/Scanner'
 import ReportCard from './pages/ReportCard'
 import Details from './pages/Details'
@@ -8,15 +9,26 @@ import About from './pages/About'
 function App() {
   return (
     <BrowserRouter>
-      <div className="app-container">
-        <Routes>
-          <Route path="/" element={<Scanner />} />
-          <Route path="/report" element={<ReportCard />} />
-          <Route path="/details" element={<Details />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/about" element={<About />} />
-        </Routes>
-      </div>
+      <Routes>
+        {/* landing page — full width, no container constraint */}
+        <Route path="/" element={<Landing />} />
+
+        {/* scanner app — narrow mobile container */}
+        <Route
+          path="/app/*"
+          element={
+            <div className="app-container">
+              <Routes>
+                <Route path="/" element={<Scanner />} />
+                <Route path="report" element={<ReportCard />} />
+                <Route path="details" element={<Details />} />
+                <Route path="history" element={<History />} />
+                <Route path="about" element={<About />} />
+              </Routes>
+            </div>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   )
 }

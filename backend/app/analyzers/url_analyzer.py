@@ -146,7 +146,7 @@ def analyze_url(content: str, scam_domains: List[str]) -> Tuple[UrlInfo, List[Ch
         CheckResult(
             label="APK download link",
             passed=not has_apk,
-            value="DANGER: Links to an APK file — installing unknown apps is very risky" if has_apk else "No APK download detected",
+            value="Links to an APK file — installing unknown apps is very risky" if has_apk else "No APK download detected",
         )
     )
 
@@ -156,7 +156,7 @@ def analyze_url(content: str, scam_domains: List[str]) -> Tuple[UrlInfo, List[Ch
         CheckResult(
             label="Brand lookalike / typosquatting",
             passed=lookalike_brand is None,
-            value=f"DANGER: Domain appears to impersonate '{lookalike_brand}'" if lookalike_brand else "No brand impersonation detected",
+            value=f"Domain appears to impersonate '{lookalike_brand}'" if lookalike_brand else "No brand impersonation detected",
         )
     )
 
@@ -167,7 +167,7 @@ def analyze_url(content: str, scam_domains: List[str]) -> Tuple[UrlInfo, List[Ch
         CheckResult(
             label="Known scam domain",
             passed=not is_known_scam_domain,
-            value="DANGER: This domain is in the known scam/phishing database" if is_known_scam_domain else "Not in scam domain database",
+            value="This domain is in the known scam/phishing database" if is_known_scam_domain else "Not in scam domain database",
         )
     )
 
@@ -175,7 +175,7 @@ def analyze_url(content: str, scam_domains: List[str]) -> Tuple[UrlInfo, List[Ch
     domain_age_days = get_domain_age_days(domain)
     if domain_age_days is not None:
         if domain_age_days < 7:
-            age_label = f"DANGER: Domain is only {domain_age_days} days old — extremely new"
+            age_label = f"Domain is only {domain_age_days} days old — extremely new"
             age_passed = False
         elif domain_age_days < 30:
             age_label = f"Caution: Domain is only {domain_age_days} days old — recently registered"
@@ -230,7 +230,7 @@ def analyze_url(content: str, scam_domains: List[str]) -> Tuple[UrlInfo, List[Ch
         CheckResult(
             label="Google Safe Browsing",
             passed=not on_safe_browsing_list,
-            value="DANGER: Flagged by Google Safe Browsing" if on_safe_browsing_list else "Not flagged by Google Safe Browsing",
+            value="Flagged by Google Safe Browsing" if on_safe_browsing_list else "Not flagged by Google Safe Browsing",
         )
     )
 
@@ -240,7 +240,7 @@ def analyze_url(content: str, scam_domains: List[str]) -> Tuple[UrlInfo, List[Ch
         CheckResult(
             label="URLhaus threat database",
             passed=not on_urlhaus,
-            value="DANGER: Active malware/phishing URL in URLhaus database" if on_urlhaus else "Not found in URLhaus database",
+            value="Active malware/phishing URL in URLhaus database" if on_urlhaus else "Not found in URLhaus database",
         )
     )
 

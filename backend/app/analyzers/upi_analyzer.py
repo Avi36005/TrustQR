@@ -74,7 +74,8 @@ def analyze_upi(content: str, scam_upi_ids: List[str]) -> Tuple[UpiInfo, List[Ch
     # Determine if this is a collect request
     # mode=collect or mode=02 signals a collect/pull payment request
     is_collect_request = mode in ("collect", "02", "2")
-    direction = "incoming" if is_collect_request else "outgoing"
+    # collect request = someone demanding money FROM you → money leaves your account
+    direction = "outgoing" if is_collect_request else "outgoing"
 
     # --- Check 1: Valid UPI ID format ---
     valid_format = is_valid_upi_id(upi_id) if upi_id else False
@@ -129,7 +130,7 @@ def analyze_upi(content: str, scam_upi_ids: List[str]) -> Tuple[UpiInfo, List[Ch
         CheckResult(
             label="Collect request detected",
             passed=not is_collect_request,
-            value="DANGER: This is a collect/pull request — do NOT approve without verifying the recipient"
+            value="This is a collect/pull request — do NOT approve without verifying the recipient"
             if is_collect_request
             else "Standard push payment",
         )

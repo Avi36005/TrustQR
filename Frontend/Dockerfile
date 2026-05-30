@@ -3,8 +3,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-ENV VITE_API_URL=https://trustqr-api-3692981377.us-central1.run.app
-ENV VITE_CHATBOT_URL=https://trustqr-3692981377.us-central1.run.app
+ENV VITE_API_URL=https://trustqr-api-3692981377.asia-south1.run.app
+ENV VITE_CHATBOT_URL=https://trustqr-3692981377.asia-south1.run.app
 RUN npm run build
 
 FROM nginx:alpine

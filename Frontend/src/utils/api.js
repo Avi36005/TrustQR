@@ -1,5 +1,5 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-export const CHATBOT_URL = import.meta.env.VITE_CHATBOT_URL || 'http://localhost:8001'
+export const CHATBOT_URL = import.meta.env.VITE_CHATBOT_URL || 'https://trustqr-3692981377.us-central1.run.app'
 
 export async function analyzeQR(qrContent) {
   const res = await fetch(`${API_URL}/api/analyze`, {

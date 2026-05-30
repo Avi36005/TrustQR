@@ -32,7 +32,7 @@ export default function ReportCard() {
 
   const state = location.state
   if (!state || !state.result) {
-    navigate('/app')
+    navigate('/app/choose')
     return null
   }
 
@@ -62,7 +62,7 @@ export default function ReportCard() {
       <div
         className="absolute inset-0"
         style={{ background: 'rgba(0,0,0,0.4)' }}
-        onClick={() => navigate('/app')}
+        onClick={() => navigate('/app/choose')}
       />
 
       {/* report card — no rounded corners, feels like a definitive report */}
@@ -98,7 +98,7 @@ export default function ReportCard() {
             <p className="text-base text-black leading-snug mb-1">
               {result.verdict || 'This QR code has been analyzed.'}
             </p>
-            <p className="text-sm" style={{ color: cfg.dotColor }}>
+            <p className="text-sm" style={{ color: '#555555' }}>
               {cfg.actionText}
             </p>
           </div>
@@ -107,17 +107,26 @@ export default function ReportCard() {
           {isUPI && upiInfo && (
             <div
               className="mb-5 px-4 py-4"
-              style={{
-                border: `1.5px solid ${upiInfo.direction === 'outgoing' ? '#C73E1D' : '#2D7A4F'}`,
-                background: upiInfo.direction === 'outgoing' ? '#FFF8F7' : '#F6FBF8',
-              }}
+              style={(() => {
+                // incoming (credit) is always green regardless of safety
+                if (upiInfo.direction !== 'outgoing') {
+                  return {
+                    border: '1px solid #2D7A4F',
+                    background: '#F0FFF6',
+                  }
+                }
+                // outgoing — use safety level for color
+                if (safety === 'safe') return { border: '1px solid #EEEEEE', background: '#FAFAFA' }
+                if (safety === 'caution') return { border: '1px solid #D4A017', background: '#FFFDF0' }
+                return { border: '1px solid #C73E1D', background: '#FFF5F3' }
+              })()}
             >
               <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#999' }}>
                 Money direction
               </p>
               <p className="font-bold text-black" style={{ fontSize: 20, lineHeight: 1.2 }}>
                 Money will{' '}
-                <span style={{ color: upiInfo.direction === 'outgoing' ? '#C73E1D' : '#2D7A4F' }}>
+                <span style={{ color: upiInfo.direction !== 'outgoing' ? '#2D7A4F' : (safety === 'safe' ? '#000000' : safety === 'caution' ? '#D4A017' : '#C73E1D') }}>
                   {upiInfo.direction === 'outgoing' ? 'LEAVE' : 'ENTER'}
                 </span>{' '}
                 your account
@@ -159,7 +168,7 @@ export default function ReportCard() {
               <div style={{ border: '1px solid #E5E5E5' }}>
                 <div className="px-4">
                   {checks.map((c, i) => (
-                    <CheckRow key={i} label={c.label} passed={c.passed} value={c.value} />
+                    <CheckRow key={i} label={c.label} passed={c.passed} value={c.value} warning={c.warning} />
                   ))}
                 </div>
               </div>
@@ -187,7 +196,7 @@ export default function ReportCard() {
 
           <div className="flex justify-center">
             <button
-              onClick={() => navigate('/app')}
+              onClick={() => navigate('/app/choose')}
               className="text-sm text-black underline underline-offset-2 bg-transparent border-none cursor-pointer"
             >
               Scan Again

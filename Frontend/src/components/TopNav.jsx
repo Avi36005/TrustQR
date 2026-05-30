@@ -18,33 +18,46 @@ export default function TopNav() {
       position: 'sticky',
       top: 0,
       zIndex: 100,
+      width: '100%',
     }}>
       <div style={{
         height: 60,
-        maxWidth: 1100,
-        margin: '0 auto',
-        padding: '0 24px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        padding: '0 32px',
       }}>
+        {/* logo — left edge */}
         <span
           onClick={() => navigate('/')}
-          style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 18, color: '#000', cursor: 'pointer', flexShrink: 0 }}
+          style={{
+            fontFamily: 'DM Sans, sans-serif',
+            fontWeight: 700,
+            fontSize: 18,
+            color: '#000',
+            cursor: 'pointer',
+            flexShrink: 0,
+            marginRight: 'auto',
+          }}
         >
           TrustQR
         </span>
-        <div style={{ display: 'flex', gap: 28, flexShrink: 0 }}>
+
+        {/* nav links — right side */}
+        <div style={{ display: 'flex', gap: 32, flexShrink: 0 }}>
           {navLinks.map(link => {
-            const isActive = location.pathname === link.path ||
+            const isActive =
+              location.pathname === link.path ||
               (link.path === '/app/choose' && location.pathname.startsWith('/app'))
             return (
               <button
                 key={link.path}
                 onClick={() => navigate(link.path)}
                 style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  fontFamily: 'Inter, sans-serif', fontSize: 14,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: 14,
                   color: isActive ? '#000000' : '#888888',
                   fontWeight: isActive ? 500 : 400,
                   padding: 0,

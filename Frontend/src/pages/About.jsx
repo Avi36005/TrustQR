@@ -30,7 +30,7 @@ export default function About() {
   }, [])
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: 'Inter, sans-serif', paddingBottom: 52 }}>
+    <div className="app-page" style={{ minHeight: '100vh', background: '#fff', fontFamily: 'Inter, sans-serif' }}>
       <div style={{ padding: '32px 24px 0', maxWidth: 680, margin: '0 auto' }}>
 
         <h1 style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 24, color: '#000', marginBottom: 32, lineHeight: 1.2 }}>

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Html5Qrcode } from 'html5-qrcode'
-import { Upload } from 'lucide-react'
 import ProgressBar from '../components/ProgressBar'
 import { analyzeQR } from '../utils/api'
 import { addToHistory } from '../utils/history'
@@ -11,11 +10,10 @@ export default function Scanner() {
   const scannerRef = useRef(null)
   const isRunningRef = useRef(false)
   const isProcessingRef = useRef(false)
-  const fileInputRef = useRef(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // shared handler for any decoded QR text (camera or upload)
+  // shared handler for any decoded QR text (camera)
   async function handleDecoded(decodedText, qrInstance) {
     if (isProcessingRef.current) return
     isProcessingRef.current = true
@@ -52,7 +50,7 @@ export default function Scanner() {
       setLoading(false)
       isProcessingRef.current = false
 
-      // restart camera scan after upload error
+      // restart camera scan after error
       if (qrInstance && !isRunningRef.current) {
         const config = { fps: 10, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 }
         qrInstance.start({ facingMode: 'environment' }, config, () => {}, () => {})
@@ -81,7 +79,7 @@ export default function Scanner() {
     ).then(() => {
       isRunningRef.current = true
     }).catch(() => {
-      setError('Camera access denied. You can still upload a QR image below.')
+      setError('Camera access denied. Please go back and upload a QR image instead.')
     })
 
     return () => {
@@ -90,36 +88,13 @@ export default function Scanner() {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function handleFileUpload(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    // reset input so same file can be re-selected
-    e.target.value = ''
-
-    if (isProcessingRef.current) return
-
-    setError(null)
-
-    // use a fresh Html5Qrcode instance for file scanning (separate from camera instance)
-    const reader = new Html5Qrcode('qr-file-reader')
-    try {
-      const decoded = await reader.scanFile(file, false)
-      await reader.clear()
-      handleDecoded(decoded, scannerRef.current)
-    } catch {
-      await reader.clear().catch(() => {})
-      setError('No QR code found in this image. Try a clearer photo.')
-    }
-  }
-
   return (
     <div className="flex flex-col h-screen bg-white">
       <ProgressBar visible={loading} />
 
       {/* header */}
       <div className="flex items-center px-5 pt-5 pb-3">
-        <span className="font-serif text-2xl text-black tracking-tight" style={{ fontFamily: 'Instrument Serif, serif' }}>
+        <span className="font-bold text-2xl text-black tracking-tight" style={{ fontFamily: 'DM Sans, sans-serif' }}>
           TrustQR
         </span>
       </div>
@@ -139,39 +114,11 @@ export default function Scanner() {
         </div>
       </div>
 
-      {/* hidden div required by html5-qrcode for file scanning */}
-      <div id="qr-file-reader" style={{ display: 'none' }} />
-
-      {/* tagline + upload */}
+      {/* tagline */}
       <div className="flex flex-col items-center px-5 pt-4 pb-2 gap-3">
         <p className="text-sm text-center" style={{ color: '#999' }}>
           Think before you scan.
         </p>
-
-        {/* divider */}
-        <div className="flex items-center gap-3 w-full max-w-xs">
-          <div className="flex-1 h-px bg-[#E5E5E5]" />
-          <span className="text-xs text-[#999]">or</span>
-          <div className="flex-1 h-px bg-[#E5E5E5]" />
-        </div>
-
-        {/* upload button */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileUpload}
-          disabled={loading}
-        />
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 border border-[#E5E5E5] text-sm text-black bg-white hover:bg-[#FAFAFA] active:bg-[#F5F5F5] transition-colors disabled:opacity-40"
-        >
-          <Upload size={14} color="#000" />
-          Upload QR image
-        </button>
       </div>
 
       {/* error */}

@@ -8,7 +8,7 @@ function FeatureRow({ icon: Icon, title, body }) {
         className="flex items-center justify-center flex-shrink-0"
         style={{ width: 32, height: 32, border: '1px solid #E5E5E5' }}
       >
-        <Icon size={14} color="#000" />
+        <Icon size={16} strokeWidth={1.5} color="#000" />
       </div>
       <div>
         <p className="text-sm font-semibold text-black mb-0.5">{title}</p>
@@ -20,15 +20,9 @@ function FeatureRow({ icon: Icon, title, body }) {
 
 function ScamRow({ title, desc }) {
   return (
-    <div className="flex items-start gap-3 py-3.5 border-b border-[#E5E5E5] last:border-b-0">
-      <span
-        className="flex-shrink-0 mt-1.5"
-        style={{ width: 5, height: 5, borderRadius: '50%', background: '#C73E1D', display: 'inline-block' }}
-      />
-      <div>
-        <p className="text-sm font-medium text-black">{title}</p>
-        <p className="text-xs text-[#666] mt-0.5 leading-snug">{desc}</p>
-      </div>
+    <div style={{ padding: '14px 0', borderBottom: '1px solid #EEEEEE' }} className="last:border-b-0">
+      <p style={{ fontSize: 14, fontWeight: 500, color: '#000', fontFamily: 'Inter, sans-serif' }}>— {title}</p>
+      <p style={{ fontSize: 12, color: '#666', marginTop: 3, lineHeight: 1.5, fontFamily: 'Inter, sans-serif' }}>{desc}</p>
     </div>
   )
 }
@@ -40,52 +34,56 @@ export default function Landing() {
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
 
       {/* nav */}
-      <nav style={{ borderBottom: '1px solid #E5E5E5' }}>
-        <div className="px-6 py-4 flex items-center justify-between max-w-4xl mx-auto">
+      <nav>
+        <div className="px-6 py-4 flex items-center max-w-4xl mx-auto">
           <span
-            className="text-xl text-black"
-            style={{ fontFamily: 'Instrument Serif, serif' }}
+            style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 18, color: '#000000' }}
           >
             TrustQR
           </span>
-          <button
-            onClick={() => navigate('/app')}
-            className="text-sm text-black px-4 py-2 hover:bg-[#F5F5F5] active:bg-[#EBEBEB] transition-colors"
-            style={{ border: '1px solid #000' }}
-          >
-            Open Scanner
-          </button>
         </div>
       </nav>
 
       {/* hero */}
       <section className="px-6 pt-16 pb-12 max-w-4xl mx-auto">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#999] mb-6">
+        <p style={{
+          fontSize: 11,
+          letterSpacing: '0.15em',
+          color: '#888888',
+          fontWeight: 500,
+          fontFamily: 'Inter, sans-serif',
+          textTransform: 'uppercase',
+          marginBottom: 24,
+        }}>
           QR code safety — India
         </p>
         <h1
-          className="text-black mb-5"
+          className="text-black"
           style={{
-            fontFamily: 'Instrument Serif, serif',
+            fontFamily: 'DM Sans, sans-serif',
             fontSize: 'clamp(38px, 5.5vw, 68px)',
             lineHeight: 1.1,
             letterSpacing: '-0.5px',
             maxWidth: 700,
+            marginBottom: 0,
           }}
         >
           Know what a QR code does before you scan it.
         </h1>
+        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 18, fontWeight: 400, color: '#555555', marginTop: 8, marginBottom: 24 }}>
+          QR codes hide things. We don't.
+        </p>
         <p className="text-base text-[#444] leading-relaxed mb-8" style={{ maxWidth: 520 }}>
           QR code scams are the fastest-growing fraud in India. A single scan can empty your UPI account or hand over your banking credentials. TrustQR checks every QR before you act on it.
         </p>
         <div className="flex flex-wrap items-center gap-5">
           <button
-            onClick={() => navigate('/app')}
-            className="flex items-center gap-2 text-sm font-medium text-white px-5 py-3 hover:bg-[#1a1a1a] active:bg-[#333] transition-colors"
-            style={{ background: '#000' }}
+            onClick={() => navigate('/app/choose')}
+            className="flex items-center gap-2 text-sm text-white hover:bg-[#1a1a1a] active:bg-[#333] transition-colors"
+            style={{ background: '#000', padding: '14px 28px', borderRadius: 0, fontFamily: 'DM Sans, sans-serif', fontWeight: 500 }}
           >
             Get Started
-            <ArrowRight size={15} />
+            <ArrowRight size={16} strokeWidth={1.5} />
           </button>
           <p className="text-sm text-[#999]">Camera + image upload. No account needed.</p>
         </div>
@@ -95,10 +93,20 @@ export default function Landing() {
       <section style={{ borderTop: '1px solid #E5E5E5', borderBottom: '1px solid #E5E5E5' }}>
         <div className="px-6 py-12 max-w-4xl mx-auto grid md:grid-cols-2 gap-10 items-start">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#999] mb-4">The problem</p>
+            <p style={{
+              fontSize: 11,
+              letterSpacing: '0.15em',
+              color: '#888888',
+              fontWeight: 500,
+              fontFamily: 'Inter, sans-serif',
+              textTransform: 'uppercase',
+              marginBottom: 24,
+            }}>
+              The problem
+            </p>
             <h2
               className="text-black mb-4"
-              style={{ fontFamily: 'Instrument Serif, serif', fontSize: 28, lineHeight: 1.25 }}
+              style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 28, lineHeight: 1.25 }}
             >
               QR codes hide what they do until it is too late.
             </h2>
@@ -112,7 +120,7 @@ export default function Landing() {
 
           <div style={{ border: '1px solid #E5E5E5' }}>
             <div className="px-4 py-3" style={{ borderBottom: '1px solid #E5E5E5', background: '#FAFAFA' }}>
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#C73E1D]">Common QR scam types in India</p>
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#000000' }}>Common QR scam types in India</p>
             </div>
             <div className="px-4">
               <ScamRow title="UPI collect requests" desc="Looks like receiving money — actually sends money from your account" />
@@ -127,7 +135,17 @@ export default function Landing() {
 
       {/* how it works */}
       <section className="px-6 py-12 max-w-4xl mx-auto">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#999] mb-8">How it works</p>
+        <p style={{
+          fontSize: 11,
+          letterSpacing: '0.15em',
+          color: '#888888',
+          fontWeight: 500,
+          fontFamily: 'Inter, sans-serif',
+          textTransform: 'uppercase',
+          marginBottom: 24,
+        }}>
+          How it works
+        </p>
         <div className="grid md:grid-cols-3" style={{ border: '1px solid #E5E5E5' }}>
           {[
             {
@@ -155,8 +173,14 @@ export default function Landing() {
               }}
             >
               <p
-                className="text-[#CCC] mb-4"
-                style={{ fontFamily: 'Instrument Serif, serif', fontSize: 30, lineHeight: 1 }}
+                style={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontWeight: 700,
+                  fontSize: 13,
+                  color: '#000000',
+                  marginBottom: 16,
+                  letterSpacing: '0.05em',
+                }}
               >
                 {step.n}
               </p>
@@ -170,7 +194,17 @@ export default function Landing() {
       {/* what we check */}
       <section style={{ borderTop: '1px solid #E5E5E5' }}>
         <div className="px-6 py-12 max-w-4xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#999] mb-8">What we check</p>
+          <p style={{
+            fontSize: 11,
+            letterSpacing: '0.15em',
+            color: '#888888',
+            fontWeight: 500,
+            fontFamily: 'Inter, sans-serif',
+            textTransform: 'uppercase',
+            marginBottom: 24,
+          }}>
+            What we check
+          </p>
           <div className="max-w-xl" style={{ border: '1px solid #E5E5E5' }}>
             <div className="px-4">
               <FeatureRow
@@ -209,19 +243,19 @@ export default function Landing() {
           <div>
             <h2
               className="text-black mb-1"
-              style={{ fontFamily: 'Instrument Serif, serif', fontSize: 28, lineHeight: 1.2 }}
+              style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 28, lineHeight: 1.2 }}
             >
               Scan the next QR safely.
             </h2>
             <p className="text-sm text-[#666]">Free. No sign-up. Works on any device with a camera.</p>
           </div>
           <button
-            onClick={() => navigate('/app')}
-            className="flex items-center gap-2 text-sm font-medium text-white px-5 py-3 hover:bg-[#1a1a1a] active:bg-[#333] transition-colors self-start md:self-auto flex-shrink-0"
-            style={{ background: '#000' }}
+            onClick={() => navigate('/app/choose')}
+            className="flex items-center gap-2 text-sm text-white hover:bg-[#1a1a1a] active:bg-[#333] transition-colors self-start md:self-auto flex-shrink-0"
+            style={{ background: '#000', padding: '14px 28px', borderRadius: 0, fontFamily: 'DM Sans, sans-serif', fontWeight: 500 }}
           >
             Get Started
-            <ArrowRight size={15} />
+            <ArrowRight size={16} strokeWidth={1.5} />
           </button>
         </div>
       </section>
@@ -229,8 +263,7 @@ export default function Landing() {
       {/* footer */}
       <footer className="px-6 py-5 max-w-4xl mx-auto flex items-center justify-between">
         <span
-          className="text-base text-black"
-          style={{ fontFamily: 'Instrument Serif, serif' }}
+          style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 18, color: '#000000' }}
         >
           TrustQR
         </span>

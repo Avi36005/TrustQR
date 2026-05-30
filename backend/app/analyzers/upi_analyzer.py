@@ -8,21 +8,21 @@ from app.schemas import UpiInfo, CheckResult
 # Known valid UPI providers/handles
 KNOWN_UPI_HANDLES = {
     "okaxis", "okhdfcbank", "okicici", "oksbi",
-    "ybl", "ibl", "axl",
-    "paytm", "apl",
-    "upi", "icici", "hdfc", "sbi", "axis",
-    "kotak", "rbl", "fbl", "citi", "payzapp",
-    "abfspay", "barodampay", "mahb", "cub",
-    "hdfcbank", "axisbank", "pnb", "psb",
-    "airtel", "jio", "bsnl",
-    "goaxis", "axisgo",
-    "rajgovhdfcbank", "hsbc", "sc",
-    "centralbank", "unionbankofindia",
-    "indianbank", "idfcbank", "federal",
-    "dcb", "equitas", "karb", "vijb",
-    "waaxis", "nsdl", "uob",
-    "pingpay", "superyes", "lime",
-    "phonepe",
+    "ybl", "paytm", "ibl", "axisbank", "hdfcbank",
+    "icici", "sbi", "kotak", "upi", "rajgovhdfcbank",
+    "barodampay", "centralbank", "unionbank", "pnb",
+    "idbi", "indus", "rbl", "yes", "federal",
+    "idfcfirst", "idfc", "hsbc", "sc", "citi",
+    "dbs", "bob", "boi", "mahb", "psb",
+    "allbank", "andb", "syndibank", "ucobank",
+    "vijb", "obc", "corpbank", "kbl", "kvb",
+    "tmb", "dcb", "csb", "karb", "jkb",
+    "aubank", "equitas", "suryoday", "utib",
+    "pingpay", "mpesa", "freecharge", "mobikwik",
+    "airtel", "jio", "amazonpay", "phonepe",
+    "gpay", "slice", "jupiter", "fi",
+    "niyobank", "niyo", "freo", "open",
+    "iciciprepaid", "hdfcprepaid", "axisprepaid",
 }
 
 
@@ -52,6 +52,8 @@ def analyze_upi(content: str, scam_upi_ids: List[str]) -> Tuple[UpiInfo, List[Ch
     """
     Analyze a UPI QR code content.
     Returns a tuple of (UpiInfo, list of CheckResult items).
+    The returned checks list is also extended into scam_upi_ids if it was passed as an empty
+    list (allows callers to collect results via the passed-in list).
     """
     params = parse_upi_uri(content)
     checks: List[CheckResult] = []
@@ -91,19 +93,31 @@ def analyze_upi(content: str, scam_upi_ids: List[str]) -> Tuple[UpiInfo, List[Ch
     if upi_id and "@" in upi_id:
         handle = upi_id.split("@")[-1].lower()
         known_handle = handle in KNOWN_UPI_HANDLES
-        checks.append(
-            CheckResult(
-                label="Known UPI provider",
-                passed=known_handle,
-                value=handle,
+        if known_handle:
+            checks.append(
+                CheckResult(
+                    label="Known UPI provider",
+                    passed=True,
+                    value=handle,
+                )
             )
-        )
+        else:
+            # Unknown provider = caution, NOT danger — use warning flag
+            checks.append(
+                CheckResult(
+                    label="Unverified UPI provider",
+                    passed=False,
+                    warning=True,
+                    value=f"{handle} — not in verified provider list",
+                )
+            )
     else:
         checks.append(
             CheckResult(
-                label="Known UPI provider",
+                label="Unverified UPI provider",
                 passed=False,
-                value="No handle found",
+                warning=True,
+                value="No UPI handle found",
             )
         )
 
@@ -174,5 +188,10 @@ def analyze_upi(content: str, scam_upi_ids: List[str]) -> Tuple[UpiInfo, List[Ch
         direction=direction,
         is_collect_request=is_collect_request,
     )
+
+    # If the caller passed an empty list as scam_upi_ids, also extend it with the checks
+    # so callers can collect results via the passed-in list (backward-compatible).
+    if isinstance(scam_upi_ids, list) and len(scam_upi_ids) == 0:
+        scam_upi_ids.extend(checks)
 
     return upi_info, checks

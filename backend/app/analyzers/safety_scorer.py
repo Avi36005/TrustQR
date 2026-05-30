@@ -26,7 +26,6 @@ WARNING_LABELS = {
     "Unknown network warning",
     "Hidden network",
     "Password in QR code",
-    "Known UPI provider",
     "Transaction note review",
 }
 
@@ -41,8 +40,15 @@ def compute_safety(checks: List[CheckResult]) -> str:
     danger_count = 0
     warning_count = 0
 
+    # checks with warning=True count as caution-level, never danger
+    warning_count += sum(1 for c in checks if not c.passed and getattr(c, 'warning', False))
+
     for check in checks:
         if check.passed:
+            continue
+
+        # warning=True checks already counted above — skip danger/warning label logic for them
+        if getattr(check, 'warning', False):
             continue
 
         label = check.label

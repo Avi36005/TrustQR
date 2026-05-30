@@ -10,6 +10,7 @@ class CheckResult(BaseModel):
     label: str
     passed: bool
     value: Optional[str] = None
+    warning: Optional[bool] = False  # add this line
 
 
 class UpiInfo(BaseModel):

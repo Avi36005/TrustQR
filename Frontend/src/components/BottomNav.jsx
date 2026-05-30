@@ -12,7 +12,7 @@ export default function BottomNav() {
   const location = useLocation()
 
   return (
-    <div style={{
+    <div className="bottom-nav-mobile" style={{
       position: 'fixed',
       bottom: 0,
       left: 0,

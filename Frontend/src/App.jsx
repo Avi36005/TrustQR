@@ -5,8 +5,8 @@ import ReportCard from './pages/ReportCard'
 import Details from './pages/Details'
 import Choose from './pages/Choose'
 import CameraScan from './pages/CameraScan'
-import UploadScan from './pages/UploadScan'
 import BottomNav from './components/BottomNav'
+import TopNav from './components/TopNav'
 import History from './pages/History'
 import Community from './pages/Community'
 import About from './pages/About'
@@ -14,6 +14,9 @@ import About from './pages/About'
 function AppLayout({ children }) {
   return (
     <>
+      <div className="top-nav-tablet-desktop">
+        <TopNav />
+      </div>
       {children}
       <BottomNav />
     </>
@@ -25,7 +28,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* landing page — full width, no container constraint */}
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<><div className="top-nav-tablet-desktop"><TopNav /></div><Landing /></>} />
 
         {/* top-level app screens with bottom nav */}
         <Route path="/history" element={<AppLayout><History /></AppLayout>} />
@@ -44,7 +47,6 @@ function App() {
                   <Route path="report" element={<ReportCard />} />
                   <Route path="details" element={<Details />} />
                   <Route path="scan" element={<CameraScan />} />
-                  <Route path="upload" element={<UploadScan />} />
                 </Routes>
               </div>
             </AppLayout>

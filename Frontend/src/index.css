@@ -44,13 +44,75 @@ h1, h2, h3, h4 {
 
 .app-container {
   width: 100%;
-  max-width: 480px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #ffffff;
   position: relative;
   overflow-x: hidden;
+}
+
+@media (min-width: 768px) {
+  .bottom-nav-mobile {
+    display: none !important;
+  }
+}
+
+.top-nav-tablet-desktop {
+  display: none;
+}
+@media (min-width: 768px) {
+  .top-nav-tablet-desktop {
+    display: block;
+  }
+}
+
+.app-page {
+  padding-bottom: 52px; /* space for bottom nav on mobile */
+}
+@media (min-width: 768px) {
+  .app-page {
+    padding-bottom: 0;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+@media (min-width: 1024px) {
+  .app-page {
+    max-width: 1100px;
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+}
+
+.community-layout {
+  display: block;
+}
+.community-left {
+  margin-bottom: 24px;
+}
+@media (min-width: 1024px) {
+  .community-layout {
+    display: grid;
+    grid-template-columns: 35% 65%;
+    gap: 48px;
+    align-items: start;
+  }
+  .community-left {
+    position: sticky;
+    top: 80px;
+    margin-bottom: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .community-page {
+    max-width: 1100px;
+    padding-left: 48px;
+    padding-right: 48px;
+  }
 }
 
 /* slide-up animation */

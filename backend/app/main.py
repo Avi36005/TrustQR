@@ -11,7 +11,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from app.database import engine, get_db
+from app.database import engine, get_db, run_migrations
 from app import models
 from app.models import ScamUpiId, KnownScamDomain, AppStats, QRFlag
 from app.schemas import (
@@ -92,6 +92,7 @@ def _seed_app_stats(db: Session) -> None:
 async def lifespan(app: FastAPI):
     """Application lifespan: create tables and seed DB on startup."""
     models.Base.metadata.create_all(bind=engine)
+    run_migrations()
     db = next(get_db())
     try:
         seed_database(db)

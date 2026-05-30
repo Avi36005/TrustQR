@@ -6,7 +6,6 @@
   --color-danger: #C73E1D;
   --color-border: #E5E5E5;
   --font-family-sans: 'Inter', sans-serif;
-  --font-family-serif: 'Instrument Serif', serif;
 }
 
 * {
@@ -21,6 +20,18 @@ body {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'DM Sans', sans-serif;
+}
+
+p, li, span {
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.2;
 }
 
 #root {

@@ -14,7 +14,7 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
-        serif: ['Instrument Serif', 'serif'],
+        heading: ['DM Sans', 'sans-serif'],
       },
     },
   },

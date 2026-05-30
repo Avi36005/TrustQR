@@ -73,16 +73,23 @@ def classify_qr_type(content: str) -> str:
     Classify the type of QR code based on its content.
     Returns: 'upi', 'url', 'wifi', or 'text'
     """
-    content_stripped = content.strip()
+    import re
+    c = content.strip()
+    cl = c.lower()
 
-    if content_stripped.lower().startswith("upi://"):
+    if cl.startswith("upi://"):
         return "upi"
-    elif content_stripped.lower().startswith("http://") or content_stripped.lower().startswith("https://"):
+    if cl.startswith(("http://", "https://")):
         return "url"
-    elif content_stripped.upper().startswith("WIFI:"):
+    if c.upper().startswith("WIFI:"):
         return "wifi"
-    else:
-        return "text"
+    # www. or bare domain-like URLs
+    if cl.startswith("www."):
+        return "url"
+    # Looks like a domain/URL (e.g. "google.com/path" or "flipkart.com?...")
+    if re.match(r'^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}([/?#]|$)', c):
+        return "url"
+    return "text"
 
 
 def generate_verdict(safety: str, qr_type: str, checks: List[CheckResult]) -> str:

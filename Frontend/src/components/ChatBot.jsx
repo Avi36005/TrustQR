@@ -1,5 +1,20 @@
 import { useState, useRef, useEffect } from 'react'
 import { CHATBOT_URL } from '../utils/api'
+import { getHistory } from '../utils/history'
+
+function buildScanContext(history) {
+  if (!history || history.length === 0) return null
+  const recent = history.slice(0, 10)
+  const lines = recent.map((s, i) => {
+    const type = (s.qr_type || 'unknown').toUpperCase()
+    const safety = (s.safety || 'unknown').toUpperCase()
+    const content = s.qr_content ? s.qr_content.slice(0, 80) : ''
+    const verdict = s.verdict ? ` — ${s.verdict}` : ''
+    const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString('en-IN') : ''
+    return `${i + 1}. [${safety}] ${type}: ${content}${verdict} (${date})`
+  })
+  return lines.join('\n')
+}
 
 const WELCOME = "Hi! I'm TrustQR AI. Ask me anything about QR code scams — paste a QR code URL or UPI string and I'll analyze it for you."
 
@@ -9,12 +24,25 @@ export default function ChatBot() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [speaking, setSpeaking] = useState(null)
+  const [scanCount, setScanCount] = useState(0)
   const bottomRef = useRef(null)
   const audioRef = useRef(null)
   const inputRef = useRef(null)
+  const scanContextRef = useRef(null)
 
   useEffect(() => {
-    if (open && inputRef.current) inputRef.current.focus()
+    const h = getHistory()
+    setScanCount(h.length)
+    scanContextRef.current = buildScanContext(h)
+  }, [])
+
+  useEffect(() => {
+    if (open) {
+      const h = getHistory()
+      setScanCount(h.length)
+      scanContextRef.current = buildScanContext(h)
+      if (inputRef.current) inputRef.current.focus()
+    }
   }, [open])
 
   useEffect(() => {
@@ -35,7 +63,7 @@ export default function ChatBot() {
       const res = await fetch(`${CHATBOT_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history }),
+        body: JSON.stringify({ message: text, history, scan_context: scanContextRef.current }),
       })
       if (!res.ok) throw new Error('Chat failed')
       const data = await res.json()
@@ -151,7 +179,9 @@ export default function ChatBot() {
             }} />
             <div>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#fff', fontFamily: 'DM Sans, sans-serif' }}>TrustQR AI</p>
-              <p style={{ margin: 0, fontSize: 10, color: '#aaa' }}>QR scam expert</p>
+              <p style={{ margin: 0, fontSize: 10, color: '#aaa' }}>
+                {scanCount > 0 ? `synced with ${scanCount} scan${scanCount !== 1 ? 's' : ''}` : 'QR scam expert'}
+              </p>
             </div>
           </div>
 

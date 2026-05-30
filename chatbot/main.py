@@ -77,6 +77,7 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     history: Optional[List[Message]] = []
+    scan_context: Optional[str] = None
 
 
 class SpeakRequest(BaseModel):
@@ -95,7 +96,11 @@ async def chat(req: ChatRequest):
 
     client = OpenAI(api_key=OPENAI_API_KEY)
 
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    system = SYSTEM_PROMPT
+    if req.scan_context:
+        system += f"\n\nUSER'S RECENT SCAN HISTORY (from their TrustQR app):\n{req.scan_context}\n\nUse this history to give personalized advice when relevant."
+
+    messages = [{"role": "system", "content": system}]
     for msg in (req.history or []):
         messages.append({"role": msg.role, "content": msg.content})
     messages.append({"role": "user", "content": req.message})

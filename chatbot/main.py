@@ -114,8 +114,23 @@ async def chat(req: ChatRequest):
         )
         reply = response.choices[0].message.content
         return {"reply": reply}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"OpenAI error: {str(e)}")
+    except Exception as openai_err:
+        # fallback to Groq
+        groq_key = os.getenv("GROQ_API_KEY", "")
+        if not groq_key:
+            raise HTTPException(status_code=500, detail=f"OpenAI error: {str(openai_err)}")
+        try:
+            groq_client = OpenAI(api_key=groq_key, base_url="https://api.groq.com/openai/v1")
+            response = groq_client.chat.completions.create(
+                model="llama3-8b-8192",
+                messages=messages,
+                max_tokens=600,
+                temperature=0.4,
+            )
+            reply = response.choices[0].message.content
+            return {"reply": reply}
+        except Exception as groq_err:
+            raise HTTPException(status_code=500, detail=f"Both OpenAI and Groq failed: {str(groq_err)}")
 
 
 @app.post("/api/speak")

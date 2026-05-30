@@ -2,6 +2,42 @@ import { useState, useRef, useEffect } from 'react'
 import { CHATBOT_URL } from '../utils/api'
 import { getHistory } from '../utils/history'
 
+function inlineFormat(text, key) {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g)
+  return (
+    <span key={key}>
+      {parts.map((p, i) => {
+        if (p.startsWith('**') && p.endsWith('**')) return <strong key={i}>{p.slice(2, -2)}</strong>
+        if (p.startsWith('*') && p.endsWith('*')) return <em key={i}>{p.slice(1, -1)}</em>
+        return p
+      })}
+    </span>
+  )
+}
+
+function MarkdownText({ text }) {
+  const lines = text.split('\n')
+  const elements = []
+  let i = 0
+  while (i < lines.length) {
+    const line = lines[i]
+    if (/^#{1,3} /.test(line)) {
+      const content = line.replace(/^#{1,3} /, '')
+      elements.push(<div key={i} style={{ fontWeight: 700, marginTop: i > 0 ? 6 : 0, marginBottom: 2 }}>{inlineFormat(content, 0)}</div>)
+    } else if (/^[-*] /.test(line)) {
+      elements.push(<div key={i} style={{ paddingLeft: 10, marginBottom: 1 }}>· {inlineFormat(line.slice(2), 0)}</div>)
+    } else if (/^\d+\. /.test(line)) {
+      elements.push(<div key={i} style={{ paddingLeft: 10, marginBottom: 1 }}>{inlineFormat(line, 0)}</div>)
+    } else if (line.trim() === '') {
+      elements.push(<div key={i} style={{ height: 6 }} />)
+    } else {
+      elements.push(<div key={i}>{inlineFormat(line, 0)}</div>)
+    }
+    i++
+  }
+  return <>{elements}</>
+}
+
 function buildScanContext(history) {
   if (!history || history.length === 0) return null
   const recent = history.slice(0, 10)
@@ -24,11 +60,13 @@ export default function ChatBot() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [speaking, setSpeaking] = useState(null)
+  const [listening, setListening] = useState(false)
   const [scanCount, setScanCount] = useState(0)
   const bottomRef = useRef(null)
   const audioRef = useRef(null)
   const inputRef = useRef(null)
   const scanContextRef = useRef(null)
+  const recognitionRef = useRef(null)
 
   useEffect(() => {
     const h = getHistory()
@@ -107,6 +145,32 @@ export default function ChatBot() {
       e.preventDefault()
       sendMessage()
     }
+  }
+
+  function toggleVoiceInput() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SR) return
+
+    if (listening) {
+      recognitionRef.current?.stop()
+      setListening(false)
+      return
+    }
+
+    const rec = new SR()
+    rec.lang = 'en-IN'
+    rec.interimResults = false
+    rec.maxAlternatives = 1
+    recognitionRef.current = rec
+
+    rec.onstart = () => setListening(true)
+    rec.onend = () => setListening(false)
+    rec.onerror = () => setListening(false)
+    rec.onresult = (e) => {
+      const transcript = e.results[0][0].transcript
+      setInput(prev => (prev ? prev + ' ' + transcript : transcript))
+    }
+    rec.start()
   }
 
   return (
@@ -205,11 +269,10 @@ export default function ChatBot() {
                     color: msg.role === 'user' ? '#fff' : '#000',
                     fontSize: 13,
                     lineHeight: 1.5,
-                    whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
                   }}
                 >
-                  {msg.content}
+                  {msg.role === 'user' ? msg.content : <MarkdownText text={msg.content} />}
                 </div>
                 {msg.role === 'assistant' && (
                   <button
@@ -279,6 +342,29 @@ export default function ChatBot() {
                 lineHeight: 1.5,
               }}
             />
+            {(window.SpeechRecognition || window.webkitSpeechRecognition) && (
+              <button
+                onClick={toggleVoiceInput}
+                title={listening ? 'Stop listening' : 'Speak your question'}
+                style={{
+                  background: listening ? '#C73E1D' : 'none',
+                  border: 'none',
+                  borderLeft: '1px solid #E5E5E5',
+                  cursor: 'pointer',
+                  padding: '0 12px',
+                  color: listening ? '#fff' : '#888',
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <rect x="5" y="1" width="4" height="7" rx="2" fill="currentColor"/>
+                  <path d="M2 7a5 5 0 0010 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                  <line x1="7" y1="12" x2="7" y2="13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+            )}
             <button
               onClick={sendMessage}
               disabled={loading || !input.trim()}

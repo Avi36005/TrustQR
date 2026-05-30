@@ -1,6 +1,46 @@
 import { useNavigate } from 'react-router-dom'
 import { getHistory, formatTimestamp } from '../utils/history'
 
+function extractDomain(url) {
+  try {
+    const u = new URL(url)
+    return u.hostname.replace(/^www\./, '')
+  } catch {
+    return url.slice(0, 40)
+  }
+}
+
+function parseUpiParams(content) {
+  try {
+    const url = new URL(content)
+    const params = Object.fromEntries(url.searchParams)
+    return { payee: params.pn || '', upiId: params.pa || '' }
+  } catch {
+    return { payee: '', upiId: '' }
+  }
+}
+
+function getDisplayContent(entry) {
+  const { qr_type, qr_content } = entry
+  if (qr_type === 'upi') {
+    const { payee, upiId } = parseUpiParams(qr_content || '')
+    return {
+      primary: payee || upiId || 'UPI Payment',
+      secondary: upiId ? upiId.slice(0, 30) : '',
+    }
+  }
+  if (qr_type === 'url') {
+    return {
+      primary: extractDomain(qr_content || ''),
+      secondary: (qr_content || '').slice(0, 40),
+    }
+  }
+  return {
+    primary: (qr_content || '').slice(0, 50),
+    secondary: '',
+  }
+}
+
 const typeLabels = {
   upi: 'UPI',
   url: 'URL',
@@ -34,7 +74,7 @@ export default function History() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: 'Inter, sans-serif', paddingBottom: 52 }}>
+    <div className="app-page" style={{ minHeight: '100vh', background: '#fff', fontFamily: 'Inter, sans-serif' }}>
       <div style={{ padding: '32px 24px 24px', maxWidth: 680, margin: '0 auto' }}>
         <h1 style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 24, color: '#000', marginBottom: 4, lineHeight: 1.2 }}>
           History
@@ -68,28 +108,24 @@ export default function History() {
                   gap: 12,
                 }}
               >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{
-                    fontSize: 10,
-                    letterSpacing: '0.1em',
-                    color: '#888888',
-                    textTransform: 'uppercase',
-                    marginBottom: 4,
-                    fontFamily: 'Inter, sans-serif',
-                  }}>
-                    {typeLabels[entry.qr_type] || 'QR'}
-                  </p>
-                  <p style={{
-                    fontSize: 13,
-                    color: '#555555',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    fontFamily: 'Inter, sans-serif',
-                  }}>
-                    {(entry.qr_content || '').slice(0, 40)}
-                  </p>
-                </div>
+                {(() => {
+                  const { primary, secondary } = getDisplayContent(entry)
+                  return (
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 10, letterSpacing: '0.1em', color: '#888888', textTransform: 'uppercase', marginBottom: 4, fontFamily: 'Inter, sans-serif', margin: '0 0 4px' }}>
+                        {typeLabels[entry.qr_type] || 'QR'}
+                      </p>
+                      <p style={{ fontSize: 14, color: '#000000', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Inter, sans-serif', margin: '0 0 2px' }}>
+                        {primary}
+                      </p>
+                      {secondary && (
+                        <p style={{ fontSize: 12, color: '#888888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Inter, sans-serif', margin: 0 }}>
+                          {secondary}
+                        </p>
+                      )}
+                    </div>
+                  )
+                })()}
                 <div style={{ flexShrink: 0, textAlign: 'right' }}>
                   <div style={{
                     width: 8,

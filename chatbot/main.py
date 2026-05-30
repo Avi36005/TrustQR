@@ -138,7 +138,7 @@ async def speak(req: SpeakRequest):
     if not ELEVENLABS_API_KEY:
         raise HTTPException(status_code=500, detail="ElevenLabs API key not configured")
 
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}"
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}/stream"
     headers = {
         "xi-api-key": ELEVENLABS_API_KEY,
         "Content-Type": "application/json",
@@ -152,15 +152,16 @@ async def speak(req: SpeakRequest):
         },
     }
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        try:
-            r = await client.post(url, json=payload, headers=headers)
-            if r.status_code != 200:
-                raise HTTPException(status_code=502, detail="ElevenLabs TTS failed")
-            return StreamingResponse(
-                iter([r.content]),
-                media_type="audio/mpeg",
-                headers={"Content-Disposition": "inline; filename=speech.mp3"},
-            )
-        except httpx.RequestError as e:
-            raise HTTPException(status_code=502, detail=f"ElevenLabs request error: {str(e)}")
+    async def audio_stream():
+        async with httpx.AsyncClient(timeout=60) as client:
+            async with client.stream("POST", url, json=payload, headers=headers) as r:
+                if r.status_code != 200:
+                    return
+                async for chunk in r.aiter_bytes(chunk_size=4096):
+                    yield chunk
+
+    return StreamingResponse(
+        audio_stream(),
+        media_type="audio/mpeg",
+        headers={"Cache-Control": "no-cache"},
+    )

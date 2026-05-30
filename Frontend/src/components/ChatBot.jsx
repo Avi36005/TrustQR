@@ -113,6 +113,19 @@ export default function ChatBot() {
     }
   }
 
+  function cleanForTTS(text) {
+    return text
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/^[-*]\s+/gm, '')
+      .replace(/^\d+\.\s+/gm, '')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/\n{2,}/g, '. ')
+      .replace(/\n/g, ' ')
+      .trim()
+  }
+
   async function speakMessage(text, idx) {
     if (speaking === idx) {
       audioRef.current?.pause()
@@ -124,7 +137,7 @@ export default function ChatBot() {
       const res = await fetch(`${CHATBOT_URL}/api/speak`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text: cleanForTTS(text) }),
       })
       if (!res.ok) throw new Error('TTS failed')
       const blob = await res.blob()

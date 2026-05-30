@@ -6,6 +6,8 @@ import Details from './pages/Details'
 import History from './pages/History'
 import About from './pages/About'
 import Choose from './pages/Choose'
+import CameraScan from './pages/CameraScan'
+import UploadScan from './pages/UploadScan'
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
                 <Route path="details" element={<Details />} />
                 <Route path="history" element={<History />} />
                 <Route path="about" element={<About />} />
+                <Route path="scan" element={<CameraScan />} />
+                <Route path="upload" element={<UploadScan />} />
               </Routes>
             </div>
           }

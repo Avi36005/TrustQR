@@ -37,7 +37,9 @@ export default function ReportCard() {
   }
 
   const { scan, result } = state
-  const safety = result.safety || 'caution'
+  // WiFi QR codes are treated as plain text in the UI
+  const isWifi = result.qr_type === 'wifi'
+  const safety = isWifi ? 'caution' : (result.safety || 'caution')
   const cfg = safetyConfig[safety] || safetyConfig.caution
   const checks = result.details?.checks || []
   const upiInfo = result.details?.upi_info
@@ -77,30 +79,33 @@ export default function ReportCard() {
 
           {/* status + verdict */}
           <div className="mb-5">
-            <div className="flex items-center gap-2.5 mb-2">
-              <span
-                style={{
-                  display: 'inline-block',
-                  width: 10,
-                  height: 10,
-                  borderRadius: '50%',
-                  background: cfg.dotColor,
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                className="font-bold tracking-wide"
-                style={{ fontSize: 42, color: '#000', lineHeight: 1, fontFamily: 'Inter, sans-serif', letterSpacing: '-0.5px' }}
-              >
-                {cfg.label}
-              </span>
-            </div>
-            <p className="text-base text-black leading-snug mb-1">
-              {result.verdict || 'This QR code has been analyzed.'}
-            </p>
-            <p className="text-sm" style={{ color: '#555555' }}>
-              {cfg.actionText}
-            </p>
+            {isWifi ? (
+              <>
+                <div className="flex items-center gap-2.5 mb-2">
+                  <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#888888', flexShrink: 0 }} />
+                  <span className="font-bold tracking-wide" style={{ fontSize: 42, color: '#000', lineHeight: 1, fontFamily: 'Inter, sans-serif', letterSpacing: '-0.5px' }}>
+                    UNKNOWN
+                  </span>
+                </div>
+                <p className="text-base text-black leading-snug mb-1">This QR contains network credentials.</p>
+                <p className="text-sm" style={{ color: '#555555' }}>Unknown type. Review the content carefully.</p>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2.5 mb-2">
+                  <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: cfg.dotColor, flexShrink: 0 }} />
+                  <span className="font-bold tracking-wide" style={{ fontSize: 42, color: '#000', lineHeight: 1, fontFamily: 'Inter, sans-serif', letterSpacing: '-0.5px' }}>
+                    {cfg.label}
+                  </span>
+                </div>
+                <p className="text-base text-black leading-snug mb-1">
+                  {result.verdict || 'This QR code has been analyzed.'}
+                </p>
+                <p className="text-sm" style={{ color: '#555555' }}>
+                  {cfg.actionText}
+                </p>
+              </>
+            )}
           </div>
 
           {/* UPI direction — most important info for UPI scams */}

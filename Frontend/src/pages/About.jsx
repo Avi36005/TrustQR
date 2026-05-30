@@ -1,6 +1,3 @@
-import { useState, useEffect } from 'react'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 function SectionLabel({ children }) {
   return (
@@ -20,15 +17,6 @@ function Section({ label, children }) {
 }
 
 export default function About() {
-  const [stats, setStats] = useState({ total_scans: 0, total_flags: 0 })
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/stats`)
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) setStats(d) })
-      .catch(() => {})
-  }, [])
-
   return (
     <div className="app-page" style={{ minHeight: '100vh', background: '#fff', fontFamily: 'Inter, sans-serif' }}>
       <div style={{ padding: '32px 24px 0', maxWidth: 680, margin: '0 auto' }}>
@@ -77,21 +65,7 @@ export default function About() {
           </p>
         </Section>
 
-        <Section label="By the Numbers">
-          <p style={{ fontSize: 15, color: '#000', lineHeight: 1.6, marginBottom: 8 }}>
-            {stats.total_scans.toLocaleString()} QR codes scanned by the community
-          </p>
-          <p style={{ fontSize: 15, color: '#000', lineHeight: 1.6 }}>
-            {stats.total_flags.toLocaleString()} scams reported and flagged
-          </p>
-        </Section>
-
-        <Section label="Contact">
-          <p style={{ fontSize: 14, color: '#000', lineHeight: 1.6, marginBottom: 6 }}>Email: team@trustqr.in</p>
-          <p style={{ fontSize: 14, color: '#000', lineHeight: 1.6 }}>GitHub: github.com/Avi36005/TrustQR</p>
-        </Section>
-
-        <div style={{ textAlign: 'center', padding: '32px 0' }}>
+<div style={{ textAlign: 'center', padding: '32px 0' }}>
           <p style={{ fontSize: 11, color: '#888888', fontFamily: 'Inter, sans-serif' }}>
             TrustQR — Codorra 2026 Hackathon
           </p>

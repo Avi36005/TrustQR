@@ -60,3 +60,41 @@ class FlagCountResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str
+
+
+class StatsResponse(BaseModel):
+    total_scans: int
+    total_flags: int
+
+
+class WarningItem(BaseModel):
+    display_name: str
+    warning_message: str
+    received_via: str
+    city: Optional[str] = None
+    time_ago: str
+
+
+class QRPreviewData(BaseModel):
+    payee_name: Optional[str] = None
+    upi_id: Optional[str] = None
+    amount: Optional[str] = None
+    is_collect: bool = False
+    domain: Optional[str] = None
+    raw_preview: str
+
+
+class CommunityFeedItem(BaseModel):
+    qr_hash: str
+    qr_type: str
+    qr_preview: QRPreviewData
+    flag_count: int
+    first_flagged_at: str
+    last_flagged_at: str
+    time_ago: str
+    warnings: List[WarningItem]
+
+
+class CommunityFeedResponse(BaseModel):
+    total: int
+    items: List[CommunityFeedItem]

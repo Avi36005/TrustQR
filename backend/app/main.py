@@ -13,7 +13,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.database import engine, get_db
 from app import models
-from app.models import ScamUpiId, KnownScamDomain
+from app.models import ScamUpiId, KnownScamDomain, AppStats, QRFlag
 from app.schemas import (
     AnalyzeRequest,
     AnalyzeResponse,
@@ -23,6 +23,11 @@ from app.schemas import (
     FlagCountResponse,
     HealthResponse,
     CheckResult,
+    StatsResponse,
+    QRPreviewData,
+    CommunityFeedItem,
+    CommunityFeedResponse,
+    WarningItem,
 )
 from app.analyzers.upi_analyzer import analyze_upi
 from app.analyzers.url_analyzer import analyze_url
@@ -75,6 +80,14 @@ def seed_database(db: Session) -> None:
         db.commit()
 
 
+def _seed_app_stats(db: Session) -> None:
+    for key in ("total_scans", "total_flags"):
+        existing = db.query(AppStats).filter(AppStats.key == key).first()
+        if not existing:
+            db.add(AppStats(key=key, value=0))
+    db.commit()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan: create tables and seed DB on startup."""
@@ -82,6 +95,7 @@ async def lifespan(app: FastAPI):
     db = next(get_db())
     try:
         seed_database(db)
+        _seed_app_stats(db)
     finally:
         db.close()
     yield
@@ -191,6 +205,15 @@ def analyze_qr(
         community_flags=community_flags,
     )
 
+    # increment total_scans counter
+    try:
+        stat = db.query(AppStats).filter(AppStats.key == "total_scans").first()
+        if stat:
+            stat.value += 1
+            db.commit()
+    except Exception:
+        pass
+
     return AnalyzeResponse(
         safety=safety,
         qr_type=qr_type,
@@ -207,12 +230,65 @@ def flag_qr_code(
     db: Session = Depends(get_db),
 ):
     """Flag a QR code as suspicious or malicious."""
+    import json as _json
     content = body.qr_content.strip()
 
     if not content:
         raise HTTPException(status_code=400, detail="qr_content cannot be empty")
 
+    qr_type_val = classify_qr_type(content)
+
+    # build a simple preview
+    preview = {"raw_preview": content[:60]}
+    if qr_type_val == "upi":
+        from urllib.parse import urlparse, parse_qs
+        try:
+            parsed = urlparse(content)
+            params = parse_qs(parsed.query)
+            flat = {k: v[0] for k, v in params.items()}
+            preview = {
+                "payee_name": flat.get("pn", "Unknown"),
+                "upi_id": flat.get("pa", ""),
+                "amount": flat.get("am"),
+                "is_collect": flat.get("mode", "").lower() in ("collect", "02", "2"),
+                "domain": None,
+                "raw_preview": content[:60],
+            }
+        except Exception:
+            pass
+    elif qr_type_val == "url":
+        try:
+            import tldextract
+            ext = tldextract.extract(content)
+            preview = {
+                "payee_name": None,
+                "upi_id": None,
+                "amount": None,
+                "is_collect": False,
+                "domain": f"{ext.domain}.{ext.suffix}" if ext.suffix else ext.domain,
+                "raw_preview": content[:60],
+            }
+        except Exception:
+            pass
+
     updated = flag_qr(db, content)
+
+    # Set qr_type and qr_preview_data only on new records (flag_count == 1)
+    if updated.flag_count == 1:
+        updated.qr_type = qr_type_val
+        updated.qr_preview_data = _json.dumps(preview)
+        db.commit()
+        db.refresh(updated)
+
+    # increment total_flags counter
+    try:
+        stat = db.query(AppStats).filter(AppStats.key == "total_flags").first()
+        if stat:
+            stat.value += 1
+            db.commit()
+    except Exception:
+        pass
+
     return FlagResponse(success=True, new_flag_count=updated.flag_count)
 
 
@@ -226,3 +302,81 @@ def get_qr_flag_count(
     """Get the community flag count for a QR hash."""
     count = get_flag_count(db, qr_hash)
     return FlagCountResponse(qr_hash=qr_hash, flag_count=count)
+
+
+@app.get("/api/stats", response_model=StatsResponse)
+def get_stats(db: Session = Depends(get_db)):
+    scans_row = db.query(AppStats).filter(AppStats.key == "total_scans").first()
+    flags_row = db.query(AppStats).filter(AppStats.key == "total_flags").first()
+    return StatsResponse(
+        total_scans=scans_row.value if scans_row else 0,
+        total_flags=flags_row.value if flags_row else 0,
+    )
+
+
+@app.get("/api/community/feed", response_model=CommunityFeedResponse)
+def get_community_feed(
+    limit: int = 20,
+    offset: int = 0,
+    type: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    from datetime import datetime, timezone
+    import json
+
+    def time_ago(dt_str: str) -> str:
+        try:
+            if isinstance(dt_str, str):
+                dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+            else:
+                dt = dt_str
+            now = datetime.now(timezone.utc)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            diff = int((now - dt).total_seconds())
+            if diff < 60: return f"{diff}s ago"
+            if diff < 3600: return f"{diff // 60}m ago"
+            if diff < 86400: return f"{diff // 3600}h ago"
+            return f"{diff // 86400}d ago"
+        except Exception:
+            return "recently"
+
+    query = db.query(QRFlag).filter(QRFlag.flag_count > 0)
+    if type:
+        query = query.filter(QRFlag.qr_type == type)
+    total = query.count()
+    flags = query.order_by(QRFlag.last_flagged_at.desc()).offset(offset).limit(limit).all()
+
+    items = []
+    for flag in flags:
+        try:
+            preview_data = json.loads(flag.qr_preview_data) if flag.qr_preview_data else {}
+        except Exception:
+            preview_data = {}
+
+        preview = QRPreviewData(
+            payee_name=preview_data.get("payee_name"),
+            upi_id=preview_data.get("upi_id"),
+            amount=str(preview_data.get("amount")) if preview_data.get("amount") else None,
+            is_collect=preview_data.get("is_collect", False),
+            domain=preview_data.get("domain"),
+            raw_preview=preview_data.get("raw_preview", ""),
+        )
+
+        items.append(CommunityFeedItem(
+            qr_hash=flag.qr_hash,
+            qr_type=flag.qr_type or "text",
+            qr_preview=preview,
+            flag_count=flag.flag_count,
+            first_flagged_at=str(flag.first_flagged_at),
+            last_flagged_at=str(flag.last_flagged_at),
+            time_ago=time_ago(str(flag.last_flagged_at)),
+            warnings=[],
+        ))
+
+    return CommunityFeedResponse(total=total, items=items)
+
+
+@app.get("/api/warnings/recent")
+def get_recent_warnings(db: Session = Depends(get_db)):
+    return {"warnings": []}

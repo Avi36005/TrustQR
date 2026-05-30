@@ -92,8 +92,8 @@ export default function Scanner() {
     <div className="flex flex-col h-screen bg-white">
       <ProgressBar visible={loading} />
 
-      {/* header */}
-      <div className="flex items-center px-5 pt-5 pb-3">
+      {/* header — mobile only; TopNav handles desktop */}
+      <div className="flex items-center px-5 pt-5 pb-3 md:hidden">
         <span className="font-bold text-2xl text-black tracking-tight" style={{ fontFamily: 'DM Sans, sans-serif' }}>
           TrustQR
         </span>

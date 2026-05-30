@@ -19,12 +19,16 @@ export default function TopNav() {
       top: 0,
       zIndex: 100,
       width: '100%',
+      boxSizing: 'border-box',
     }}>
       <div style={{
         height: 60,
         display: 'flex',
         alignItems: 'center',
         padding: '0 32px',
+        maxWidth: 1200,
+        margin: '0 auto',
+        width: '100%',
       }}>
         {/* logo — left edge */}
         <span
@@ -37,13 +41,14 @@ export default function TopNav() {
             cursor: 'pointer',
             flexShrink: 0,
             marginRight: 'auto',
+            paddingRight: 24,
           }}
         >
           TrustQR
         </span>
 
         {/* nav links — right side */}
-        <div style={{ display: 'flex', gap: 32, flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: 28, flexShrink: 0 }}>
           {navLinks.map(link => {
             const isActive =
               location.pathname === link.path ||

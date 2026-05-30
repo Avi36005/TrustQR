@@ -33,8 +33,8 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
 
-      {/* nav */}
-      <nav>
+      {/* nav — mobile only; desktop uses TopNav */}
+      <nav className="md:hidden">
         <div className="px-6 py-4 flex items-center max-w-4xl mx-auto">
           <span
             style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 18, color: '#000000' }}
@@ -91,7 +91,7 @@ export default function Landing() {
 
       {/* the problem */}
       <section style={{ borderTop: '1px solid #E5E5E5', borderBottom: '1px solid #E5E5E5' }}>
-        <div className="px-6 py-12 max-w-4xl mx-auto grid md:grid-cols-2 gap-10 items-start">
+        <div className="px-6 py-12 max-w-4xl mx-auto grid md:grid-cols-2 gap-6 items-start">
           <div>
             <p style={{
               fontSize: 11,

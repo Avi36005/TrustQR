@@ -59,22 +59,12 @@ export default function ReportCard() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col justify-end z-40" style={{ maxWidth: 480, margin: '0 auto' }}>
-      {/* backdrop */}
-      <div
-        className="absolute inset-0"
-        style={{ background: 'rgba(0,0,0,0.4)' }}
-        onClick={() => navigate('/app/choose')}
-      />
+    <div style={{ minHeight: '100vh', background: '#ffffff', fontFamily: 'Inter, sans-serif', paddingBottom: 52 }}>
+      {/* top colored accent line */}
+      {!isWifi && <div style={{ height: 3, background: cfg.dotColor, width: '100%' }} />}
+      {isWifi && <div style={{ height: 3, background: '#888888', width: '100%' }} />}
 
-      {/* report card — no rounded corners, feels like a definitive report */}
-      <div
-        className="relative bg-white slide-up overflow-y-auto"
-        style={{ maxHeight: '92vh' }}
-      >
-        {/* top accent bar — color-coded by safety */}
-        <div style={{ height: 3, background: cfg.dotColor, width: '100%' }} />
-
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 48px' }}>
         <div className="px-5 pb-8 pt-5">
 
           {/* status + verdict */}

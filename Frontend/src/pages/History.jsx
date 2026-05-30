@@ -1,21 +1,25 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Clock } from 'lucide-react'
 import { getHistory, formatTimestamp } from '../utils/history'
-import SafetyDot from '../components/SafetyDot'
 
 const typeLabels = {
-  upi: 'UPI Payment',
+  upi: 'UPI',
   url: 'URL',
-  wifi: 'Wi-Fi',
-  text: 'Text',
-  unknown: 'Unknown',
+  wifi: 'TEXT',
+  text: 'TEXT',
+  unknown: 'QR',
+}
+
+const safetyColors = {
+  safe: '#2D7A4F',
+  caution: '#D4A017',
+  danger: '#C73E1D',
 }
 
 export default function History() {
   const navigate = useNavigate()
   const history = getHistory()
 
-  function handleRowClick(entry) {
+  function handleRow(entry) {
     navigate('/app/report', {
       state: {
         scan: entry,
@@ -30,47 +34,72 @@ export default function History() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* header */}
-      <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-[#E5E5E5]">
-        <button
-          onClick={() => navigate('/app')}
-          className="p-1 -ml-1 bg-transparent border-none cursor-pointer"
-          aria-label="Go back"
-        >
-          <ArrowLeft size={16} strokeWidth={1.5} color="#000" />
-        </button>
-        <span className="text-lg font-semibold text-black">History</span>
-      </div>
+    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: 'Inter, sans-serif', paddingBottom: 52 }}>
+      <div style={{ padding: '32px 24px 24px', maxWidth: 680, margin: '0 auto' }}>
+        <h1 style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 24, color: '#000', marginBottom: 4, lineHeight: 1.2 }}>
+          History
+        </h1>
+        <p style={{ fontSize: 13, color: '#888888', marginBottom: 32, lineHeight: 1.6 }}>
+          Your recent scans. Stored only on this device.
+        </p>
 
-      {/* list */}
-      <div className="flex-1 overflow-y-auto">
         {history.length === 0 ? (
-          <div className="flex flex-col items-center justify-center flex-1 px-5 py-20 text-center">
-            <Clock size={16} strokeWidth={1.5} color="#999" className="mb-4" />
-            <p className="text-sm text-[#666]">
-              No scans yet. Start scanning to build history.
-            </p>
+          <div style={{ textAlign: 'center', paddingTop: 80 }}>
+            <p style={{ fontSize: 15, color: '#888888', marginBottom: 8 }}>No scans yet.</p>
+            <p style={{ fontSize: 13, color: '#888888' }}>Scans you make will appear here.</p>
           </div>
         ) : (
-          <div className="divide-y divide-[#E5E5E5]">
+          <div>
             {history.map((entry) => (
               <button
                 key={entry.id}
-                onClick={() => handleRowClick(entry)}
-                className="w-full flex items-center gap-3 px-5 py-4 bg-white hover:bg-[#FAFAFA] active:bg-[#F5F5F5] transition-colors text-left"
+                onClick={() => handleRow(entry)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '16px 0',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: '1px solid #EEEEEE',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  gap: 12,
+                }}
               >
-                <SafetyDot safety={entry.safety} size={10} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-black truncate">
-                    {typeLabels[entry.qr_type] || 'Unknown'}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{
+                    fontSize: 10,
+                    letterSpacing: '0.1em',
+                    color: '#888888',
+                    textTransform: 'uppercase',
+                    marginBottom: 4,
+                    fontFamily: 'Inter, sans-serif',
+                  }}>
+                    {typeLabels[entry.qr_type] || 'QR'}
                   </p>
-                  <p className="text-xs text-[#999] mt-0.5 truncate">
-                    {entry.qr_content}
+                  <p style={{
+                    fontSize: 13,
+                    color: '#555555',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    fontFamily: 'Inter, sans-serif',
+                  }}>
+                    {(entry.qr_content || '').slice(0, 40)}
                   </p>
                 </div>
-                <div className="flex-shrink-0 text-right">
-                  <p className="text-xs text-[#999]">
+                <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                  <div style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: safetyColors[entry.safety] || '#888888',
+                    marginBottom: 4,
+                    marginLeft: 'auto',
+                  }} />
+                  <p style={{ fontSize: 11, color: '#888888', fontFamily: 'Inter, sans-serif' }}>
                     {formatTimestamp(entry.timestamp)}
                   </p>
                 </div>

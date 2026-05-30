@@ -105,7 +105,9 @@ export default function ChatBot() {
       })
       if (!res.ok) throw new Error('Chat failed')
       const data = await res.json()
+      const replyIdx = messages.length + 1
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
+      speakMessage(data.reply, replyIdx)
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I could not connect right now. Please try again.' }])
     } finally {
@@ -140,14 +142,41 @@ export default function ChatBot() {
         body: JSON.stringify({ text: cleanForTTS(text) }),
       })
       if (!res.ok) throw new Error('TTS failed')
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current.src = url
-        audioRef.current.onended = () => setSpeaking(null)
-        audioRef.current.play()
+
+      // stream audio — start playing as soon as first bytes arrive
+      const audio = audioRef.current
+      if (!audio) return
+
+      audio.pause()
+
+      if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
+        const ms = new MediaSource()
+        const blobUrl = URL.createObjectURL(ms)
+        audio.src = blobUrl
+        await audio.play().catch(() => {})
+
+        await new Promise((resolve) => {
+          ms.addEventListener('sourceopen', async () => {
+            const sb = ms.addSourceBuffer('audio/mpeg')
+            const reader = res.body.getReader()
+            const pump = async () => {
+              const { done, value } = await reader.read()
+              if (done) { try { ms.endOfStream() } catch {} resolve(); return }
+              if (sb.updating) await new Promise(r => sb.addEventListener('updateend', r, { once: true }))
+              try { sb.appendBuffer(value) } catch {}
+              sb.addEventListener('updateend', pump, { once: true })
+            }
+            pump()
+          }, { once: true })
+        })
+      } else {
+        // fallback for browsers without MediaSource
+        const blob = await res.blob()
+        audio.src = URL.createObjectURL(blob)
+        await audio.play().catch(() => {})
       }
+
+      audio.onended = () => setSpeaking(null)
     } catch {
       setSpeaking(null)
     }

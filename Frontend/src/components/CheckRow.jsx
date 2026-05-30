@@ -1,10 +1,12 @@
-import { Check, X } from 'lucide-react'
+import { Check, X, AlertTriangle } from 'lucide-react'
 
-export default function CheckRow({ label, passed, value }) {
+export default function CheckRow({ label, passed, value, warning }) {
   return (
     <div className="flex items-start gap-3 py-3 border-b border-[#E5E5E5] last:border-b-0">
       {passed ? (
         <Check size={15} color="#2D7A4F" strokeWidth={2.5} className="flex-shrink-0 mt-0.5" />
+      ) : warning ? (
+        <AlertTriangle size={15} color="#D4A017" strokeWidth={2.5} className="flex-shrink-0 mt-0.5" />
       ) : (
         <X size={15} color="#C73E1D" strokeWidth={2.5} className="flex-shrink-0 mt-0.5" />
       )}

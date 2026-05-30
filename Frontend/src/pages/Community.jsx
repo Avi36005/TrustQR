@@ -124,7 +124,7 @@ export default function Community() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: 'Inter, sans-serif', paddingBottom: 52 }}>
-      <div style={{ padding: '32px 24px 0', maxWidth: 680, margin: '0 auto' }}>
+      <div className="community-page" style={{ padding: '32px 24px 0', maxWidth: 1100, margin: '0 auto' }}>
         <h1 style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: 24, color: '#000', marginBottom: 4, lineHeight: 1.2 }}>
           Community Warnings
         </h1>
@@ -132,64 +132,71 @@ export default function Community() {
           QR codes flagged as scams by the community.
         </p>
 
-        {/* stats bar */}
-        <div style={{ border: '1px solid #EEEEEE', padding: 20, display: 'flex', marginBottom: 24 }}>
-          <div style={{ flex: 1, textAlign: 'center' }}>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 28, color: '#000', margin: 0, lineHeight: 1 }}>{stats.total_scans.toLocaleString()}</p>
-            <p style={{ fontSize: 11, color: '#888888', margin: '6px 0 0', textTransform: 'uppercase', letterSpacing: '0.1em' }}>QR codes scanned</p>
+        <div className="community-layout">
+          {/* left column: stats, search, refresh, section label */}
+          <div className="community-left">
+            {/* stats bar */}
+            <div style={{ border: '1px solid #EEEEEE', padding: 20, display: 'flex', marginBottom: 24 }}>
+              <div style={{ flex: 1, textAlign: 'center' }}>
+                <p style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 28, color: '#000', margin: 0, lineHeight: 1 }}>{stats.total_scans.toLocaleString()}</p>
+                <p style={{ fontSize: 11, color: '#888888', margin: '6px 0 0', textTransform: 'uppercase', letterSpacing: '0.1em' }}>QR codes scanned</p>
+              </div>
+              <div style={{ width: 1, background: '#EEEEEE', margin: '0 20px' }} />
+              <div style={{ flex: 1, textAlign: 'center' }}>
+                <p style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 28, color: '#000', margin: 0, lineHeight: 1 }}>{stats.total_flags.toLocaleString()}</p>
+                <p style={{ fontSize: 11, color: '#888888', margin: '6px 0 0', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Scams reported</p>
+              </div>
+            </div>
+
+            {/* search */}
+            <div style={{ position: 'relative', marginBottom: 24 }}>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search by UPI ID, domain, or keyword..."
+                style={{ width: '100%', border: '1px solid #CCCCCC', borderRadius: 0, padding: '12px 40px 12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#000', background: '#fff', outline: 'none', boxSizing: 'border-box' }}
+              />
+              {search && (
+                <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#888' }}>×</button>
+              )}
+            </div>
+
+            {/* section label + refresh button */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <p style={{ fontSize: 11, letterSpacing: '0.15em', color: '#888888', fontWeight: 500, textTransform: 'uppercase', margin: 0 }}>
+                Flagged QR Codes
+              </p>
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                style={{ padding: '8px 20px', background: '#fff', border: '1px solid #000', borderRadius: 0, cursor: refreshing ? 'default' : 'pointer', fontSize: 13, fontFamily: 'Inter, sans-serif', color: '#000', opacity: refreshing ? 0.5 : 1 }}
+              >
+                {refreshing ? 'Refreshing...' : 'Refresh'}
+              </button>
+            </div>
+            <p style={{ fontSize: 13, color: '#888888', marginBottom: 24, lineHeight: 1.6 }}>
+              QR codes reported as risky by the community.
+            </p>
           </div>
-          <div style={{ width: 1, background: '#EEEEEE', margin: '0 20px' }} />
-          <div style={{ flex: 1, textAlign: 'center' }}>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 28, color: '#000', margin: 0, lineHeight: 1 }}>{stats.total_flags.toLocaleString()}</p>
-            <p style={{ fontSize: 11, color: '#888888', margin: '6px 0 0', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Scams reported</p>
+
+          {/* right column: feed */}
+          <div className="community-right">
+            {loading ? (
+              <p style={{ fontSize: 14, color: '#888888', textAlign: 'center', paddingTop: 40 }}>Loading...</p>
+            ) : filtered.length === 0 ? (
+              <div style={{ textAlign: 'center', paddingTop: 60 }}>
+                <p style={{ fontSize: 15, color: '#888888', marginBottom: 8 }}>No risky QR codes reported yet.</p>
+                <p style={{ fontSize: 13, color: '#888888', marginBottom: 16 }}>When the community flags a QR code as risky, it will appear here.</p>
+                <button onClick={() => navigate('/app/choose')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#000', textDecoration: 'underline' }}>
+                  Scan a QR code →
+                </button>
+              </div>
+            ) : (
+              filtered.map(item => <FeedCard key={item.qr_hash} item={item} />)
+            )}
           </div>
         </div>
-
-        {/* search */}
-        <div style={{ position: 'relative', marginBottom: 24 }}>
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by UPI ID, domain, or keyword..."
-            style={{ width: '100%', border: '1px solid #CCCCCC', borderRadius: 0, padding: '12px 40px 12px 16px', fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#000', background: '#fff', outline: 'none', boxSizing: 'border-box' }}
-          />
-          {search && (
-            <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#888' }}>×</button>
-          )}
-        </div>
-
-        {/* section label + refresh button */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <p style={{ fontSize: 11, letterSpacing: '0.15em', color: '#888888', fontWeight: 500, textTransform: 'uppercase', margin: 0 }}>
-            Flagged QR Codes
-          </p>
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            style={{ padding: '8px 20px', background: '#fff', border: '1px solid #000', borderRadius: 0, cursor: refreshing ? 'default' : 'pointer', fontSize: 13, fontFamily: 'Inter, sans-serif', color: '#000', opacity: refreshing ? 0.5 : 1 }}
-          >
-            {refreshing ? 'Refreshing...' : 'Refresh'}
-          </button>
-        </div>
-        <p style={{ fontSize: 13, color: '#888888', marginBottom: 24, lineHeight: 1.6 }}>
-          QR codes reported as risky by the community.
-        </p>
-
-        {/* feed */}
-        {loading ? (
-          <p style={{ fontSize: 14, color: '#888888', textAlign: 'center', paddingTop: 40 }}>Loading...</p>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', paddingTop: 60 }}>
-            <p style={{ fontSize: 15, color: '#888888', marginBottom: 8 }}>No risky QR codes reported yet.</p>
-            <p style={{ fontSize: 13, color: '#888888', marginBottom: 16 }}>When the community flags a QR code as risky, it will appear here.</p>
-            <button onClick={() => navigate('/app/choose')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#000', textDecoration: 'underline' }}>
-              Scan a QR code →
-            </button>
-          </div>
-        ) : (
-          filtered.map(item => <FeedCard key={item.qr_hash} item={item} />)
-        )}
       </div>
     </div>
   )

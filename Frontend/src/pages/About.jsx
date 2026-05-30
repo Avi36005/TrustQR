@@ -24,7 +24,7 @@ export default function About() {
           className="p-1 -ml-1 bg-transparent border-none cursor-pointer"
           aria-label="Go back"
         >
-          <ArrowLeft size={20} color="#000" />
+          <ArrowLeft size={16} strokeWidth={1.5} color="#000" />
         </button>
         <span className="text-lg font-semibold text-black">About</span>
       </div>
@@ -44,19 +44,19 @@ export default function About() {
         <Section title="How it works">
           <ul className="flex flex-col gap-3">
             <li className="flex items-start gap-3">
-              <Search size={16} color="#000" className="flex-shrink-0 mt-0.5" />
+              <Search size={16} strokeWidth={1.5} color="#000" className="flex-shrink-0 mt-0.5" />
               <span className="text-sm text-[#444]">
                 <strong className="text-black">Scan</strong> — point your camera at any QR code
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <BarChart2 size={16} color="#000" className="flex-shrink-0 mt-0.5" />
+              <BarChart2 size={16} strokeWidth={1.5} color="#000" className="flex-shrink-0 mt-0.5" />
               <span className="text-sm text-[#444]">
                 <strong className="text-black">Analyze</strong> — our backend checks domains, blocklists, UPI IDs, redirect chains, and community reports
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <Shield size={16} color="#000" className="flex-shrink-0 mt-0.5" />
+              <Shield size={16} strokeWidth={1.5} color="#000" className="flex-shrink-0 mt-0.5" />
               <span className="text-sm text-[#444]">
                 <strong className="text-black">Decide</strong> — get a plain-English verdict before you tap, pay, or visit
               </span>

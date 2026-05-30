@@ -50,7 +50,7 @@ export default function Details() {
           className="p-1 -ml-1 bg-transparent border-none cursor-pointer"
           aria-label="Go back"
         >
-          <ArrowLeft size={20} color="#000" />
+          <ArrowLeft size={16} strokeWidth={1.5} color="#000" />
         </button>
         <span className="text-lg font-semibold text-black">Details</span>
       </div>
@@ -115,7 +115,7 @@ export default function Details() {
                     <span className="text-xs text-[#999] mt-0.5 flex-shrink-0">{i + 1}</span>
                     <span className="text-sm text-black break-all">{url}</span>
                     {i < redirectChain.length - 1 && (
-                      <ArrowRight size={14} color="#999" className="flex-shrink-0 mt-0.5" />
+                      <ArrowRight size={16} strokeWidth={1.5} color="#999" className="flex-shrink-0 mt-0.5" />
                     )}
                   </div>
                 ))}

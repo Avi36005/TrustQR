@@ -38,7 +38,7 @@ export default function History() {
           className="p-1 -ml-1 bg-transparent border-none cursor-pointer"
           aria-label="Go back"
         >
-          <ArrowLeft size={20} color="#000" />
+          <ArrowLeft size={16} strokeWidth={1.5} color="#000" />
         </button>
         <span className="text-lg font-semibold text-black">History</span>
       </div>
@@ -47,7 +47,7 @@ export default function History() {
       <div className="flex-1 overflow-y-auto">
         {history.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 px-5 py-20 text-center">
-            <Clock size={32} color="#999" className="mb-4" />
+            <Clock size={16} strokeWidth={1.5} color="#999" className="mb-4" />
             <p className="text-sm text-[#666]">
               No scans yet. Start scanning to build history.
             </p>

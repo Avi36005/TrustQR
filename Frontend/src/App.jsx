@@ -7,6 +7,7 @@ import Choose from './pages/Choose'
 import CameraScan from './pages/CameraScan'
 import BottomNav from './components/BottomNav'
 import TopNav from './components/TopNav'
+import ChatBot from './components/ChatBot'
 import History from './pages/History'
 import Community from './pages/Community'
 import About from './pages/About'
@@ -26,6 +27,7 @@ function AppLayout({ children }) {
 function App() {
   return (
     <BrowserRouter>
+      <ChatBot />
       <Routes>
         {/* landing page — full width, no container constraint */}
         <Route path="/" element={<><div className="top-nav-tablet-desktop"><TopNav /></div><Landing /></>} />

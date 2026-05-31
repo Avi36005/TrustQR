@@ -34,6 +34,16 @@ There is no way to know what a QR code contains until you scan it. **TrustQR let
 
 ---
 
+## Connection to the Theme: Mass Surveillance vs. Public Safety
+
+TrustQR explores the fine line between **protecting society (Public Safety)** and **preserving individual autonomy (Personal Privacy)** in a hyperconnected digital world. It does this through three core principles:
+
+* **Empowering Individual Autonomy & Preventing Digital Profiling**: QR codes are the gateways of the physical-digital intersection. Scanning a QR code blindly forces users to interact with unknown servers, exposing them to silent redirects, IP logging, device fingerprinting, and malicious APK downloads. TrustQR provides **transparency and control**, letting users audit the target destination *before* exposing their digital identities or device footprints.
+* **Privacy-First, Zero-Surveillance Architecture**: While centralized databases tracking user scans could technically flag scams, they create a new mass surveillance vector by tracking where, when, and what individuals scan. TrustQR rejects this paradigm: all scan history is kept strictly client-side via `localStorage`. The platform checks threats without profiling the user.
+* **Community-Driven Public Safety (Bottom-Up vs. Top-Down)**: Instead of relying on intrusive, top-down state/corporate monitoring to police digital spaces, TrustQR utilizes a decentralized, community-powered model. Users can anonymously flag fraudulent QR codes, contributing to a shared, crowd-sourced blacklist that protects the wider public without compromising anyone's individual privacy rights.
+
+---
+
 ## Live Demo
 
 | Service | URL |
